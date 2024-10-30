@@ -1,0 +1,99 @@
+[
+{
+	"uri": "/",
+	"title": "Serverless Application",
+	"tags": [],
+	"description": "",
+	"content": "Deploying a Serverless Website for Basic Data Input and Output with AWS Services Overview In this lab, you will learn the purpose and how to integrate services to create a website with two operations: input and output of student data.\nContents Introduction Preparation Steps Check the Results Clean Up "
+},
+{
+	"uri": "/2-prerequiste/2.1-createec2/",
+	"title": "Create IAM Role",
+	"tags": [],
+	"description": "",
+	"content": "In this step, we will create a Role with two permissions: LambdaFullAccess and DynamoDbFullAccess.\nAccess the AWS Console and search for the Identity and Access Management (IAM) service. In the IAM interface, select Role. Select Create Role. In the Trusted Entity Type section, select AWS Service and for the Use Case, choose Lambda. In the Add Permissions section, search for and select the following two permissions, then click Create Role. Name the role you just created, then finalize the creation by clicking Create Role. "
+},
+{
+	"uri": "/1-introduce/",
+	"title": "Introduction",
+	"tags": [],
+	"description": "",
+	"content": "Serverless Application is a deployment service system that includes services such as S3, DynamoDB, API Gateway, Lambda Function, and CloudFront from AWS. With the Serverless model, users do not need to think about allocating, managing system resources, upgrading, maintaining the system, or ensuring security. Serverless is like a prepaid mobile plan; businesses only pay for the resources (such as the number of requests, processing time) that the application actually uses, without paying for idle server time.\nUsing a Serverless service system provides the following benefits:\nThe entire system does not require direct management of server infrastructure. AWS Lambda automatically scales according to demand, helping to reduce costs during low traffic periods while still ensuring responsiveness when user traffic increases. The system uses services such as CloudFront, S3, API Gateway, DynamoDB, and Lambda, all of which are part of AWS, so they are easily integrated, synchronized, and highly secure. You can limit access to internal resources (DynamoDB, S3) through secure API endpoints, combined with access control via IAM. The serverless system charges fees based on the actual resources used (Lambda charges only when running), which can significantly reduce costs compared to operating a system with physical or virtual servers. CloudFront distributes content from S3, reducing latency and improving content load times for end users while ensuring global availability. With these advantages, you can use a website built with Serverless services instead of deploying the application system on physical or virtual servers.\n"
+},
+{
+	"uri": "/2-prerequiste/2.2-createiamrole/",
+	"title": "Create Table in DynamoDb",
+	"tags": [],
+	"description": "",
+	"content": "Create a Table in DynamoDb In this step, we will create a data table in DynamoDb.\nUse the search bar to find the DynamoDb service, select Tables from the left-hand menu, then click Create Table. In the Table Details section, enter the table name and set the Partition Key, then click Create Table. Wait 30 seconds for the system to create the table. "
+},
+{
+	"uri": "/2-prerequiste/",
+	"title": "Preparation Steps",
+	"tags": [],
+	"description": "",
+	"content": "\rYou need to have an AWS account.\nTo learn how to create an AWS account, you can refer to:\nGuide to Creating an AWS Account Content 2.1 Create IAM Role\n2.2 Create Table in DynamoDb\n2.3 Write Lambda Functions\n2.4 Create RESTful API\n2.5 Write Interface and Scripts for the Website\n2.6 Create S3 Bucket and Upload Website Resources\n2.7 Create Cloudfront Distribution and Apply it to the Website\n"
+},
+{
+	"uri": "/3-result/",
+	"title": "Check the Results",
+	"tags": [],
+	"description": "",
+	"content": " Access the Distribution that you just created via Cloudfront, wait for the system to finish Deploying (about 5 minutes), and then copy the Domain URL. Use a browser to visit the URL. Test the functionality of data input and output. Check if the data has been saved in DynamoDB. "
+},
+{
+	"uri": "/2-prerequiste/2.3-lambda/",
+	"title": "Create and Write Lambda Functions",
+	"tags": [],
+	"description": "",
+	"content": "Create and Write Lambda Functions In this step, we will create a data table in DynamoDb.\nUse the search bar to find the Lambda service, go to Function, and select Create Function. Name the function, set the Runtime to Python 3.12, and Architecture to x86_64. In the Permission section, choose Use an existing role, and select the role you created in step 2.1. After creating the function, wait for the code editor to be set up. Write the code for the getStudentData function as follows: import json import boto3 def lambda_handler(event, context): # Initialize a DynamoDB resource object for the specified region dynamodb = boto3.resource(\u0026#39;dynamodb\u0026#39;, region_name=\u0026#39;us-east-1\u0026#39;) # Select the DynamoDB table named \u0026#39;studentData\u0026#39; table = dynamodb.Table(\u0026#39;studentData\u0026#39;) # Scan the table to retrieve all items response = table.scan() data = response[\u0026#39;Items\u0026#39;] # If there are more items to scan, continue scanning until all items are retrieved while \u0026#39;LastEvaluatedKey\u0026#39; in response: response = table.scan(ExclusiveStartKey=response[\u0026#39;LastEvaluatedKey\u0026#39;]) data.extend(response[\u0026#39;Items\u0026#39;]) # Return the retrieved data return data In the line dynamodb = boto3.resource(\u0026lsquo;dynamodb\u0026rsquo;, region_name=\u0026lsquo;us-east-1\u0026rsquo;), replace us-east-1 with the region where your AWS account is located. My account is in the N. Virginia region, so I use us-east-1. After adjusting, click Deploy to deploy the function.\nRepeat steps 1 to 4 to create another function named insertStudentData, and use the following code: import json\rimport boto3\r# Create a DynamoDB object using the AWS SDK\rdynamodb = boto3.resource(\u0026#39;dynamodb\u0026#39;)\r# Use the DynamoDB object to select our table\rtable = dynamodb.Table(\u0026#39;studentData\u0026#39;)\r# Define the handler function that the Lambda service will use as an entry point\rdef lambda_handler(event, context):\r# Extract values from the event object we got from the Lambda service and store in variables\rstudent_id = event[\u0026#39;studentid\u0026#39;]\rname = event[\u0026#39;name\u0026#39;]\rstudent_class = event[\u0026#39;class\u0026#39;]\rage = event[\u0026#39;age\u0026#39;]\r# Write student data to the DynamoDB table and save the response in a variable\rresponse = table.put_item(\rItem={\r\u0026#39;studentid\u0026#39;: student_id,\r\u0026#39;name\u0026#39;: name,\r\u0026#39;class\u0026#39;: student_class,\r\u0026#39;age\u0026#39;: age\r}\r)\r# Return a properly formatted JSON object\rreturn {\r\u0026#39;statusCode\u0026#39;: 200,\r\u0026#39;body\u0026#39;: json.dumps(\u0026#39;Student data saved successfully!\u0026#39;)\r} "
+},
+{
+	"uri": "/4-cleanup/",
+	"title": "Clean Up Resources",
+	"tags": [],
+	"description": "",
+	"content": "We will proceed with the following steps to delete the resources we created during this exercise.\nDynamoDB Access DynamoDB Click Tables. Click Action. Type Confirm. Click Delete. Lambda Access Lambda Select the two functions. Click Action. Click Delete. Type delete and click Delete to remove the functions. Delete S3 Bucket Access S3 Select the S3 bucket we created for this exercise. Click Empty. Type permanently delete, then click Empty to delete objects in the bucket. Click Exit. After deleting all objects in the bucket, click Delete. Type the name of the S3 bucket, then click Delete bucket to remove the S3 bucket. Delete API Access API Gateway Click on the API you created. Click API Action. Click Delete API. Type confirm and click Delete to remove the API. Delete CloudFront Distribution Access CloudFront Click Distribution. Select the Distribution you created. Click Disable. Once the Distribution is disabled, its status will change to \u0026ldquo;Disabled\u0026rdquo;. When the Distribution status changes to Disabled, select it again from the list. Click Delete at the top of the interface. Confirm the action by clicking Yes, Delete in the popup dialog. "
+},
+{
+	"uri": "/2-prerequiste/2.4-api/",
+	"title": "Create REST API",
+	"tags": [],
+	"description": "",
+	"content": "Create REST API In this step, we will create a REST API.\nUse the search bar to find the API Gateway service, select REST API, then click Build. In the API details section, select New API, name the API student, and set the endpoint type to Edge-optimized. In the interface of the newly created REST API, select Create method. In the Method details interface, for Method Type choose Lambda function, and for Integration Type, select GET. In the Lambda function section, set the region to where your account is located, then choose the correct ARN of the getStudentData function. Finally, click Create method.\nRepeat steps 1 through 4 to create another method. For Integration Type, select POST, and use the ARN of the insertStudentData function.\nIn the Resource interface, select Enable CORS.\nIn the CORS settings interface, under Access-Control-Allow-Methods, check GET and POST, then click Save.\nIn the Resource interface, click Deploy API, and for Stage, choose New Stage. Set the Stage name to prod, then click Deploy.\nCopy the Invoke URL after the API has been successfully created.\n"
+},
+{
+	"uri": "/2-prerequiste/2.5-source/",
+	"title": "Write the Interface and Scripts for the Website",
+	"tags": [],
+	"description": "",
+	"content": "In this step, we will create the interface for the website that we will deploy.\nCreate two notepad files and name them index.html and scripts.js.\nIn the index.html file, paste the following code:\n\u0026lt;!DOCTYPE html\u0026gt; \u0026lt;html lang=\u0026#34;en\u0026#34;\u0026gt; \u0026lt;head\u0026gt; \u0026lt;meta charset=\u0026#34;UTF-8\u0026#34;\u0026gt; \u0026lt;meta name=\u0026#34;viewport\u0026#34; content=\u0026#34;width=device-width, initial-scale=1.0\u0026#34;\u0026gt; \u0026lt;title\u0026gt;Student Data\u0026lt;/title\u0026gt; \u0026lt;style\u0026gt; body { background-color: #f0f0f0; /* Light gray background */ color: #333; /* Dark gray text */ font-family: Arial, sans-serif; /* Use Arial font */ } h1 { color: #007bff; /* Blue heading text */ } .container { max-width: 600px; /* Limit width to 600px */ margin: 0 auto; /* Center the container */ padding: 20px; /* Add padding */ background-color: #fff; /* White background */ border-radius: 10px; /* Rounded corners */ box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */ } input[type=\u0026#34;text\u0026#34;], input[type=\u0026#34;submit\u0026#34;] { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; } input[type=\u0026#34;submit\u0026#34;] { background-color: #007bff; /* Blue submit button */ color: #fff; /* White text */ cursor: pointer; /* Add pointer cursor */ } input[type=\u0026#34;submit\u0026#34;]:hover { background-color: #0056b3; /* Darker blue on hover */ } table { width: 100%; border-collapse: collapse; } th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; } th { background-color: #f2f2f2; /* Light gray header background */ } \u0026lt;/style\u0026gt; \u0026lt;/head\u0026gt; \u0026lt;body\u0026gt; \u0026lt;div class=\u0026#34;container\u0026#34;\u0026gt; \u0026lt;h1\u0026gt;Save and View Student Data\u0026lt;/h1\u0026gt; \u0026lt;label for=\u0026#34;studentid\u0026#34;\u0026gt;Student ID:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt; \u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;studentid\u0026#34; id=\u0026#34;studentid\u0026#34;\u0026gt;\u0026lt;br\u0026gt; \u0026lt;label for=\u0026#34;name\u0026#34;\u0026gt;Name:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt; \u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;name\u0026#34; id=\u0026#34;name\u0026#34;\u0026gt;\u0026lt;br\u0026gt; \u0026lt;label for=\u0026#34;class\u0026#34;\u0026gt;Class:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt; \u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;class\u0026#34; id=\u0026#34;class\u0026#34;\u0026gt;\u0026lt;br\u0026gt; \u0026lt;label for=\u0026#34;age\u0026#34;\u0026gt;Age:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt; \u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;age\u0026#34; id=\u0026#34;age\u0026#34;\u0026gt;\u0026lt;br\u0026gt; \u0026lt;br\u0026gt; \u0026lt;input type=\u0026#34;submit\u0026#34; id=\u0026#34;savestudent\u0026#34; value=\u0026#34;Save Student Data\u0026#34;\u0026gt; \u0026lt;p id=\u0026#34;studentSaved\u0026#34;\u0026gt;\u0026lt;/p\u0026gt; \u0026lt;br\u0026gt; \u0026lt;input type=\u0026#34;submit\u0026#34; id=\u0026#34;getstudents\u0026#34; value=\u0026#34;View all Students\u0026#34;\u0026gt; \u0026lt;br\u0026gt;\u0026lt;br\u0026gt; \u0026lt;div id=\u0026#34;showStudents\u0026#34;\u0026gt; \u0026lt;table id=\u0026#34;studentTable\u0026#34;\u0026gt; \u0026lt;colgroup\u0026gt; \u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt; \u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt; \u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt; \u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt; \u0026lt;/colgroup\u0026gt; \u0026lt;thead\u0026gt; \u0026lt;tr\u0026gt; \u0026lt;th\u0026gt;Student ID\u0026lt;/th\u0026gt; \u0026lt;th\u0026gt;Name\u0026lt;/th\u0026gt; \u0026lt;th\u0026gt;Class\u0026lt;/th\u0026gt; \u0026lt;th\u0026gt;Age\u0026lt;/th\u0026gt; \u0026lt;/tr\u0026gt; \u0026lt;/thead\u0026gt; \u0026lt;tbody\u0026gt; \u0026lt;!-- Student data will be displayed here --\u0026gt; \u0026lt;/tbody\u0026gt; \u0026lt;/table\u0026gt; \u0026lt;/div\u0026gt; \u0026lt;/div\u0026gt; \u0026lt;script src=\u0026#34;scripts.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt; \u0026lt;script type=\u0026#34;text/javascript\u0026#34; src=\u0026#34;https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt; \u0026lt;/body\u0026gt; \u0026lt;/html\u0026gt;\u0026#39; In the scripts.js file, paste the following code: // Add your API endpoint here\rvar API_ENDPOINT = \u0026#34;https://wct74ebj2h.execute-api.us-east-1.amazonaws.com/prod\u0026#34;;\r// AJAX POST request to save student data\rdocument.getElementById(\u0026#34;savestudent\u0026#34;).onclick = function(){\rvar inputData = {\r\u0026#34;studentid\u0026#34;: $(\u0026#39;#studentid\u0026#39;).val(),\r\u0026#34;name\u0026#34;: $(\u0026#39;#name\u0026#39;).val(),\r\u0026#34;class\u0026#34;: $(\u0026#39;#class\u0026#39;).val(),\r\u0026#34;age\u0026#34;: $(\u0026#39;#age\u0026#39;).val()\r};\r$.ajax({\rurl: API_ENDPOINT,\rtype: \u0026#39;POST\u0026#39;,\rdata: JSON.stringify(inputData),\rcontentType: \u0026#39;application/json; charset=utf-8\u0026#39;,\rsuccess: function (response) {\rdocument.getElementById(\u0026#34;studentSaved\u0026#34;).innerHTML = \u0026#34;Student Data Saved!\u0026#34;;\r},\rerror: function () {\ralert(\u0026#34;Error saving student data.\u0026#34;);\r}\r});\r}\r// AJAX GET request to retrieve all students\rdocument.getElementById(\u0026#34;getstudents\u0026#34;).onclick = function(){ $.ajax({\rurl: API_ENDPOINT,\rtype: \u0026#39;GET\u0026#39;,\rcontentType: \u0026#39;application/json; charset=utf-8\u0026#39;,\rsuccess: function (response) {\r$(\u0026#39;#studentTable tr\u0026#39;).slice(1).remove();\rjQuery.each(response, function(i, data) { $(\u0026#34;#studentTable\u0026#34;).append(\u0026#34;\u0026lt;tr\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;studentid\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;name\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;class\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;age\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;/tr\u0026gt;\u0026#34;);\r});\r},\rerror: function () {\ralert(\u0026#34;Error retrieving student data.\u0026#34;);\r}\r});\r} In the line var API_ENDPOINT = \u0026ldquo;https://wct74ebj2h.execute-api.us-east-1.amazonaws.com/prod\";, replace https://wct74ebj2h.execute-api.us-east-1.amazonaws.com/prod with the Invoke URL you copied from the final step of section 2.4.\n"
+},
+{
+	"uri": "/2-prerequiste/2.6-s3/",
+	"title": "Create S3 Bucket and Upload Website Data to the Bucket",
+	"tags": [],
+	"description": "",
+	"content": "In this step, we will create an S3 bucket and upload the website data we wrote in step 2.5 to the bucket for website hosting.\nAccess the S3 service, find the Buckets section, and select Create bucket. In the Create Bucket interface, name your bucket as desired, but the bucket name must be unique within your region, then click Create bucket. Access the bucket you just created, and select Upload. In the Upload interface, click Add files.\nUpload the two web resource files that you created in step 2.5.\nIn the same bucket, switch to the Properties tab, scroll down to find Static website hosting, and click Edit. In the Edit interface, under Static website hosting, select Enable. For Index Document, enter index.html, and finally click Save. Switch to the Permissions tab, find the Bucket policy section, and select Edit. Select Policy generator.\nIn the Select Type of Policy section, choose S3 Bucket Policy, set Effect to Allow, enter * for Principal as shown in the image, and for Actions, select GetObject() from the list. For ARN, enter the ARN of the bucket you created, then click Add Statement, and finally scroll down and click Generate Policy.\nAfter clicking Generate Policy, you will receive a Policy JSON Document. Edit the line I highlighted by adding /* as shown in the image (the code after adding it), and then copy the policy. Return to the Edit interface of the Bucket Policy, paste the copied policy into the box, and click Save Changes. "
+},
+{
+	"uri": "/2-prerequiste/2.7-cloudfront/",
+	"title": "Create Cloudfront Distribution and Apply it to the Website",
+	"tags": [],
+	"description": "",
+	"content": "In this step, we will create a Cloudfront Distribution and apply its power to the website.\nAccess the Cloudfront service, find the Distribution section, select Create. In the Name section, select the name of the bucket you are using to store your web resources. For Origin access, choose Origin access control settings, and under Origin access control, select your bucket name. In the Web Application Firewall section, select Do not enable security protections.\nIn the Default root object section, enter index.html, then click Create distribution.\nAfter the distribution is created, click Copy Policy. Go back to the Edit policy section of the S3 bucket, paste the newly copied policy, and then click Save changes.\n"
+},
+{
+	"uri": "/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
