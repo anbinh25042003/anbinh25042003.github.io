@@ -1,0 +1,99 @@
+[
+{
+	"uri": "/vi/",
+	"title": "Serverless Application",
+	"tags": [],
+	"description": "",
+	"content": "Triển khai Website Serverless nhập xuất dữ liệu cơ bản với hệ thống các dịch vụ AWS Tổng quan Trong bài lab này, bạn sẽ tìm hiểu công dụng và cách kết hợp các dịch vụ để tạo ra 1 website có 2 thao tác là nhập và xuất dữ liệu học sinh.\nNội dung Giới thiệu Các bước chuẩn bị Kiểm tra kết quả Dọn dẹp "
+},
+{
+	"uri": "/vi/1-introduce/",
+	"title": "Giới thiệu",
+	"tags": [],
+	"description": "",
+	"content": "Severless Application là một hệ thống dịch vụ triển khai ứng dụng bao gồm các dịch vụ S3, DynamoDb,API Gateway, Lambda Function, Cloudfront của AWS, với mô hình Serverless người dùng không cần phải suy nghĩ về việc phân bổ, quản lý tài nguyên hệ điều hành cũng như việc nâng cấp, bảo trì hệ thống và bảo mật.Serverless như một gói cước di động trả trước, doanh nghiệp chỉ trả phí cho tài nguyên (như số lượng request, thời gian xử lý) mà ứng dụng của thực sự sử dụng, không phải trả cho thời gian máy chủ không hoạt động.\nVới việc sử dụng hệ thống các dịch vụ Serverless, bạn sẽ có được những ưu điểm sau:\nToàn bộ hệ thống không cần phải quản lý cơ sở hạ tầng máy chủ trực tiếp. AWS Lambda tự động mở rộng theo nhu cầu, giúp giảm thiểu chi phí khi lưu lượng truy cập thấp và vẫn đảm bảo đáp ứng khi lượng người dùng tăng cao. Hệ thống sử dụng các dịch vụ như CloudFront, S3, API Gateway, DynamoDB, và Lambda, tất cả đều thuộc AWS, nên có khả năng tích hợp dễ dàng, đồng bộ và bảo mật cao. Bạn có thể giới hạn truy cập vào các tài nguyên nội bộ (DynamoDB, S3) qua các endpoint API bảo mật, kết hợp với quyền kiểm soát từ IAM Hệ thống serverless chỉ tính phí dựa trên lượng tài nguyên thực tế sử dụng (Lambda chỉ tính khi chạy), bạn có thể tiết kiệm đáng kể chi phí so với việc phải vận hành một hệ thống với các máy chủ vật lý hoặc ảo. CloudFront làm nhiệm vụ phân phối nội dung từ S3, giảm độ trễ và cải thiện tốc độ tải nội dung cho người dùng cuối, đồng thời đảm bảo tính khả dụng toàn cầu. Với những ưu điểm trên, bạn có thể sử dụng Website được xây dựng bằng các dịch vụ Serverless thay vì triển khai hệ thống ứng dụng trên máy chủ vật lý hoặc ảo.\n"
+},
+{
+	"uri": "/vi/2-prerequiste/2.1-createec2/",
+	"title": "Tạo IAM Role",
+	"tags": [],
+	"description": "",
+	"content": "Trong bước này, chúng ta sẽ cần tạo một Role có 2 permissions là LambdaFullAccess và DynamoDbFullAccess\nTruy cập vào giao diện AWS Console và tìm kiếm dịch vụ Identity and Access Management (IAM) Trong giao diện IAM, chọn Role . Chọn Create Role Ở phần Truster Entity Type , chọn AWS Service và Use Case là Lambda. Ở phần Add Permissions , các bạn tìm và chọn 2 permission sau, sau đó Create Role. Đặt tên cho role vừa tạo , sao đó create role. "
+},
+{
+	"uri": "/vi/2-prerequiste/",
+	"title": "Các bước chuẩn bị",
+	"tags": [],
+	"description": "",
+	"content": "\rBạn cần có 1 tài khoản AWS.\nĐể tìm hiểu cách tạo tài khoản AWS, bạn có thể tham khảo tại :\nHướng dẫn tạo tài khoản AWS Nội dung 2.1 Tạo IAM Role\n2.2 Tạo Table trong DynamoDb\n2.3 Viết các hàm Lambda\n2.4 Tạo RESTful API\n2.5 Viết giao diện và scripts cho trang web\n2.6 Tạo S3 bucket và tải lên tài nguyên trang web\n2.7 Tạo Distribution Cloudfront và áp dụng lên trang web\n"
+},
+{
+	"uri": "/vi/2-prerequiste/2.2-createiamrole/",
+	"title": "Tạo bảng trong DynamoDb",
+	"tags": [],
+	"description": "",
+	"content": "Tạo bảng trong DynamoDb Trong bước này chúng ta sẽ tiến hành tạo 1 bảng dữ liệu trong DynamoDb.\nTìm dịch vụ DynamoDb bằng thanh tìm kiếm, chọn Tables ở danh mục bên trái, sao đó chọn Create Table. Ở phần Table Details, đặt tên cho bảng và đặt Partition Key, sau đó chọn Create Table. Đợi 30 giây cho hệ thống tạo bảng "
+},
+{
+	"uri": "/vi/3-result/",
+	"title": "Kiểm tra kết quả",
+	"tags": [],
+	"description": "",
+	"content": " Truy cập vào Distribution vừa tạo bằng Cloudfront, đợi hệ thống Deploying khoản 5 phút, sau đó copy Domain URL. Dùng trình duyệt truy cập URL. Sử dụng chức năng nhập và xuất dữ liệu . Kiểm tra dữ liệu có được lưu vào Dynamodb hay không. "
+},
+{
+	"uri": "/vi/2-prerequiste/2.3-lambda/",
+	"title": "Tạo và viết hàm Lambda",
+	"tags": [],
+	"description": "",
+	"content": "Tạo và viết hàm Lambda Trong bước này chúng ta sẽ tiến hành tạo 1 bảng dữ liệu trong DynamoDb.\nTìm dịch vụ Lambda bằng thanh tìm kiếm, tìm phần Function chọn Create Function. Đặt tên, Runtime chọn Python 3.12, Architecture chọn x86_64. Ở phần Permission, chọn Use an existing role, chọn role bạn đã tạo ở phần 2.1. Sau khi tạo xong, các bạn chờ cho phần code được thiết lập. Các bạn viết code cho hàm getStudentData như sau: import json import boto3 def lambda_handler(event, context): # Initialize a DynamoDB resource object for the specified region dynamodb = boto3.resource(\u0026#39;dynamodb\u0026#39;, region_name=\u0026#39;us-east-1\u0026#39;) # Select the DynamoDB table named \u0026#39;studentData\u0026#39; table = dynamodb.Table(\u0026#39;studentData\u0026#39;) # Scan the table to retrieve all items response = table.scan() data = response[\u0026#39;Items\u0026#39;] # If there are more items to scan, continue scanning until all items are retrieved while \u0026#39;LastEvaluatedKey\u0026#39; in response: response = table.scan(ExclusiveStartKey=response[\u0026#39;LastEvaluatedKey\u0026#39;]) data.extend(response[\u0026#39;Items\u0026#39;]) # Return the retrieved data return data Ở dòng dynamodb = boto3.resource(\u0026lsquo;dynamodb\u0026rsquo;, region_name=\u0026lsquo;us-east-1\u0026rsquo;) các bạn sửa us-east-1 thành vùng mà tài khoản các bạn đang ở, khi triển khai các dịch vụ này tài khoản của mình ở vùng N.Virginia nên mình để us-east-1, sau đó các bạn nhấn Deploy để triển khai hàm.\nCác bạn lập lại từ bước 1 tới bước 4 để tạo thêm 1 hàm nữa, đặt tên là insertStudentData, code của hàm như sau: import json\rimport boto3\r# Create a DynamoDB object using the AWS SDK\rdynamodb = boto3.resource(\u0026#39;dynamodb\u0026#39;)\r# Use the DynamoDB object to select our table\rtable = dynamodb.Table(\u0026#39;studentData\u0026#39;)\r# Define the handler function that the Lambda service will use as an entry point\rdef lambda_handler(event, context):\r# Extract values from the event object we got from the Lambda service and store in variables\rstudent_id = event[\u0026#39;studentid\u0026#39;]\rname = event[\u0026#39;name\u0026#39;]\rstudent_class = event[\u0026#39;class\u0026#39;]\rage = event[\u0026#39;age\u0026#39;]\r# Write student data to the DynamoDB table and save the response in a variable\rresponse = table.put_item(\rItem={\r\u0026#39;studentid\u0026#39;: student_id,\r\u0026#39;name\u0026#39;: name,\r\u0026#39;class\u0026#39;: student_class,\r\u0026#39;age\u0026#39;: age\r}\r)\r# Return a properly formatted JSON object\rreturn {\r\u0026#39;statusCode\u0026#39;: 200,\r\u0026#39;body\u0026#39;: json.dumps(\u0026#39;Student data saved successfully!\u0026#39;)\r} "
+},
+{
+	"uri": "/vi/4-cleanup/",
+	"title": "Dọn dẹp tài nguyên  ",
+	"tags": [],
+	"description": "",
+	"content": "Chúng ta sẽ tiến hành các bước sau để xóa các tài nguyên chúng ta đã tạo trong bài thực hành này.\nDynamoDB Truy cập vào DynamoDb Click Tables. Click chọn Action Nhập Confirm. Click Delete. Lambda Truy cập vào Lambda Click chọn 2 hàm. Click Action. Click chọn Delete. Điền delete và click Delete để xóa các hàm. Xóa S3 bucket Truy cập vào S3 Click chọn S3 bucket chúng ta đã tạo cho bài thực hành. Click Empty. Điền permanently delete, sau đó click Empty để tiến hành xóa object trong bucket. Click Exit. Sau khi xóa hết object trong bucket, click Delete Điền tên S3 bucket, sau đó click Delete bucket để tiến hành xóa S3 bucket. Xóa API Truy cập vào API Gateway Click vào API đã tạo. Click API Action . Click Delete API. Điền confirm và click Delete để xóa API. Xóa Distribution Cloufront Truy cập vào Cloudfront Click Distribution. Click chọn Distribution đã tạo. Click Disable. Khi Distribution đã bị vô hiệu hóa, trạng thái của nó sẽ chuyển sang \u0026ldquo;Disabled\u0026rdquo;. Khi Distribution đã chuyển sang trạng thái Disabled, chọn lại nó trong danh sách. Click Delete ở phía trên của giao diện. Xác nhận hành động bằng cách click Yes, Delete trong hộp thoại xuất hiện "
+},
+{
+	"uri": "/vi/2-prerequiste/2.4-api/",
+	"title": "Tạo REST API",
+	"tags": [],
+	"description": "",
+	"content": "Tạo REST API Trong bước này chúng ta sẽ tiến hành tạo 1 REST API\nTìm dịch vụ API Gateway bằng thanh tìm kiếm, chọn REST API, sau đó Build. Ở phần API details chọn New API , API Name student và endpoint type là Edge-optimized. Trong giao diện REST API mới tạo , chọn Create method Trong giao diện Method details, phần Method Type chọn Lambda function, phần Intergration Type chọn GET. Ở phần Lambda function, để region là vùng mà tài khoản bạn đang ở , kế tiếp chọn đúng ARN của hàm getStudentData, cuối cùng Create method.\nLập lại từ bước 1 đến bước 4 để tạo thêm 1 method nữa, phần Intergration Type chọn POST, phần ARN của hàm insertStudentData.\nỞ ngoài giao diện Resource, chọn Enable CORS.\nỞ giao diện CORS settings, phần Access-Control-Allow-Methods, đánh dấu vào GET và POST, sau đó nhấn Save.\nỞ ngoài giao diện Resource, nhấn Deploy API, phần Stage chọn New Stage Phần Stage name đặt là prod, sau đó Deploy.\nCopy Invoker URL sau khi tạo API thành công.\n"
+},
+{
+	"uri": "/vi/2-prerequiste/2.5-source/",
+	"title": "Viết giao diện và scripts cho website",
+	"tags": [],
+	"description": "",
+	"content": "Trong bước này, chúng ta sẽ viết giao diện cho website mà chúng ta sẽ triển khai.\nTạo hai file notepab và đặt tên lần lượt là index.html và scripts.js\nỞ file index.html, chúng ta dán đoạn mã này vào :\n\u0026lt;!DOCTYPE html\u0026gt;\r\u0026lt;html lang=\u0026#34;en\u0026#34;\u0026gt;\r\u0026lt;head\u0026gt;\r\u0026lt;meta charset=\u0026#34;UTF-8\u0026#34;\u0026gt;\r\u0026lt;meta name=\u0026#34;viewport\u0026#34; content=\u0026#34;width=device-width, initial-scale=1.0\u0026#34;\u0026gt;\r\u0026lt;title\u0026gt;Student Data\u0026lt;/title\u0026gt;\r\u0026lt;style\u0026gt;\rbody {\rbackground-color: #f0f0f0; /* Light gray background */\rcolor: #333; /* Dark gray text */\rfont-family: Arial, sans-serif; /* Use Arial font */\r}\rh1 {\rcolor: #007bff; /* Blue heading text */\r}\r.container {\rmax-width: 600px; /* Limit width to 600px */\rmargin: 0 auto; /* Center the container */\rpadding: 20px; /* Add padding */\rbackground-color: #fff; /* White background */\rborder-radius: 10px; /* Rounded corners */\rbox-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow */\r}\rinput[type=\u0026#34;text\u0026#34;], input[type=\u0026#34;submit\u0026#34;] {\rwidth: 100%;\rpadding: 10px;\rmargin: 5px 0;\rbox-sizing: border-box;\rborder: 1px solid #ccc;\rborder-radius: 5px;\r}\rinput[type=\u0026#34;submit\u0026#34;] {\rbackground-color: #007bff; /* Blue submit button */\rcolor: #fff; /* White text */\rcursor: pointer; /* Add pointer cursor */\r}\rinput[type=\u0026#34;submit\u0026#34;]:hover {\rbackground-color: #0056b3; /* Darker blue on hover */\r}\rtable {\rwidth: 100%;\rborder-collapse: collapse;\r}\rth, td {\rpadding: 8px;\rtext-align: left;\rborder-bottom: 1px solid #ddd;\r}\rth {\rbackground-color: #f2f2f2; /* Light gray header background */\r}\r\u0026lt;/style\u0026gt;\r\u0026lt;/head\u0026gt;\r\u0026lt;body\u0026gt;\r\u0026lt;div class=\u0026#34;container\u0026#34;\u0026gt;\r\u0026lt;h1\u0026gt;Save and View Student Data\u0026lt;/h1\u0026gt;\r\u0026lt;label for=\u0026#34;studentid\u0026#34;\u0026gt;Student ID:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;studentid\u0026#34; id=\u0026#34;studentid\u0026#34;\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;label for=\u0026#34;name\u0026#34;\u0026gt;Name:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;name\u0026#34; id=\u0026#34;name\u0026#34;\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;label for=\u0026#34;class\u0026#34;\u0026gt;Class:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;class\u0026#34; id=\u0026#34;class\u0026#34;\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;label for=\u0026#34;age\u0026#34;\u0026gt;Age:\u0026lt;/label\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;input type=\u0026#34;text\u0026#34; name=\u0026#34;age\u0026#34; id=\u0026#34;age\u0026#34;\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;br\u0026gt;\r\u0026lt;input type=\u0026#34;submit\u0026#34; id=\u0026#34;savestudent\u0026#34; value=\u0026#34;Save Student Data\u0026#34;\u0026gt;\r\u0026lt;p id=\u0026#34;studentSaved\u0026#34;\u0026gt;\u0026lt;/p\u0026gt;\r\u0026lt;br\u0026gt;\r\u0026lt;input type=\u0026#34;submit\u0026#34; id=\u0026#34;getstudents\u0026#34; value=\u0026#34;View all Students\u0026#34;\u0026gt;\r\u0026lt;br\u0026gt;\u0026lt;br\u0026gt;\r\u0026lt;div id=\u0026#34;showStudents\u0026#34;\u0026gt;\r\u0026lt;table id=\u0026#34;studentTable\u0026#34;\u0026gt;\r\u0026lt;colgroup\u0026gt;\r\u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt;\r\u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt;\r\u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt;\r\u0026lt;col style=\u0026#34;width:20%\u0026#34;\u0026gt;\r\u0026lt;/colgroup\u0026gt;\r\u0026lt;thead\u0026gt;\r\u0026lt;tr\u0026gt;\r\u0026lt;th\u0026gt;Student ID\u0026lt;/th\u0026gt;\r\u0026lt;th\u0026gt;Name\u0026lt;/th\u0026gt;\r\u0026lt;th\u0026gt;Class\u0026lt;/th\u0026gt;\r\u0026lt;th\u0026gt;Age\u0026lt;/th\u0026gt;\r\u0026lt;/tr\u0026gt;\r\u0026lt;/thead\u0026gt;\r\u0026lt;tbody\u0026gt;\r\u0026lt;!-- Student data will be displayed here --\u0026gt;\r\u0026lt;/tbody\u0026gt;\r\u0026lt;/table\u0026gt;\r\u0026lt;/div\u0026gt;\r\u0026lt;/div\u0026gt;\r\u0026lt;script src=\u0026#34;scripts.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt;\r\u0026lt;script type=\u0026#34;text/javascript\u0026#34; src=\u0026#34;https://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js\u0026#34;\u0026gt;\u0026lt;/script\u0026gt;\r\u0026lt;/body\u0026gt;\r\u0026lt;/html\u0026gt; Ở file scripts.js, chúng ta dán đoạn mã như sau : // Add your API endpoint here\rvar API_ENDPOINT = \u0026#34;https://wct74ebj2h.execute-api.us-east-1.amazonaws.com/prod\u0026#34;;\r// AJAX POST request to save student data\rdocument.getElementById(\u0026#34;savestudent\u0026#34;).onclick = function(){\rvar inputData = {\r\u0026#34;studentid\u0026#34;: $(\u0026#39;#studentid\u0026#39;).val(),\r\u0026#34;name\u0026#34;: $(\u0026#39;#name\u0026#39;).val(),\r\u0026#34;class\u0026#34;: $(\u0026#39;#class\u0026#39;).val(),\r\u0026#34;age\u0026#34;: $(\u0026#39;#age\u0026#39;).val()\r};\r$.ajax({\rurl: API_ENDPOINT,\rtype: \u0026#39;POST\u0026#39;,\rdata: JSON.stringify(inputData),\rcontentType: \u0026#39;application/json; charset=utf-8\u0026#39;,\rsuccess: function (response) {\rdocument.getElementById(\u0026#34;studentSaved\u0026#34;).innerHTML = \u0026#34;Student Data Saved!\u0026#34;;\r},\rerror: function () {\ralert(\u0026#34;Error saving student data.\u0026#34;);\r}\r});\r}\r// AJAX GET request to retrieve all students\rdocument.getElementById(\u0026#34;getstudents\u0026#34;).onclick = function(){ $.ajax({\rurl: API_ENDPOINT,\rtype: \u0026#39;GET\u0026#39;,\rcontentType: \u0026#39;application/json; charset=utf-8\u0026#39;,\rsuccess: function (response) {\r$(\u0026#39;#studentTable tr\u0026#39;).slice(1).remove();\rjQuery.each(response, function(i, data) { $(\u0026#34;#studentTable\u0026#34;).append(\u0026#34;\u0026lt;tr\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;studentid\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;name\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;class\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;td\u0026gt;\u0026#34; + data[\u0026#39;age\u0026#39;] + \u0026#34;\u0026lt;/td\u0026gt; \\\r\u0026lt;/tr\u0026gt;\u0026#34;);\r});\r},\rerror: function () {\ralert(\u0026#34;Error retrieving student data.\u0026#34;);\r}\r});\r} Ở dòng var API_ENDPOINT = \u0026ldquo;https://wct74ebj2h.execute-api.us-east-1.amazonaws.com/prod\";, các bạn thay thế https://wct74ebj2h.execute-api.us-east-1.amazonaws.com/prod bằng Invoker URL mà các bạn đã copy ở bước cuối cùng của phần 2.4.\n"
+},
+{
+	"uri": "/vi/2-prerequiste/2.6-s3/",
+	"title": "Tạo Bucket S3 và tải dữ liệu của trang web lên bucket",
+	"tags": [],
+	"description": "",
+	"content": "Trong bước này, chúng ta sẽ tạo 1 S3 bucket và tải dữ liệu của trang web chúng ta vừa viết ở bước 2.5 lên bucket đó để lưu trữ trang web.\nTruy cập vào dịch vụ S3, tìm phần Buckets, chọn Create bucket Trong giao diện Create Bucket, các bạn đặt tên bucket tùy thích nhưng tên của bucket phải là duy nhất trên region của các bạnk, sau đó Create bucket. Truy cập và trong bucket các bạn vừa tạo, chọn Upload Trong giao diện Upload, chọn Add files\nTải lên 2 file tài nguyên của web mà các bạn vừa viết ở bước 2.5\nCũng ở bucket các bạn vừa tạo , chuyển sang tab Properties, kéo xuống tìm phần Static website hosting, nhấn Edit. Trong giao diện Edit, phần Static website hosting, các bạn chọn Enable, phần Index Document, các bạn ghi index.html, cuối cùng các bạn nhấn Save. Chuyển qua tab Permissions, tìm phần Bucket policy, chọn Edit. Chọn Policy generator\nỞ phần Select Type of Policy, các bạn chọn S3 Bucket Policy, Effect Allow, Pricipal các bạn nhập dấu * như hình, phần Actions các bạn tìm trong danh sách GetObject(), phần ARN là ARN của bucket mà các bạn tạo, sau đó nhấn Add Statement, cuối cùng kéo xuống rồi chọn Generate Policy.\nSau khi nhấn Generate Policy , các bạn sẽ nhận được đoạn mã Policy JSON Document, các bạn sửa dòng mình đã đánh dấu trong hình bằng cách thêm /*, trong hình là code sau khi mình đã thêm, sau đó copy đoạn policy. Quay trở lại giao diện Edit của Bucket Policy, dán đoạn policy đã copy vào khung và nhấn Save Changes. "
+},
+{
+	"uri": "/vi/2-prerequiste/2.7-cloudfront/",
+	"title": "Tạo Distribution Cloudfront và áp dụng lên trang web",
+	"tags": [],
+	"description": "",
+	"content": "Trong bước này, chúng ta sẽ tạo 1 Distribution sử dụng sức mạnh của nó lên trang web.\nTruy cập vào dịch vụ Cloudfront, tìm phần Distribution, chọn Create, Ở phần Name, chọn tên bucket mà bạn dùng để lưu trữ tài nguyên web, phần Origin access chọn Origin access control settings, ở phần Origin access control, chọn tên bucket của bạn. Ở phần Web Application Firewall, chọn Do not enable security protections.\nỞ phần Default root object, nhập index.html, sau đó Create distribution.\nSau khi tạo xong distribution, nhấn vào Copy Policy. Quay lại phần Edit policy của bucket S3, dán policy mới copy vào, sau đó Save changes.\n"
+},
+{
+	"uri": "/vi/categories/",
+	"title": "Categories",
+	"tags": [],
+	"description": "",
+	"content": ""
+},
+{
+	"uri": "/vi/tags/",
+	"title": "Tags",
+	"tags": [],
+	"description": "",
+	"content": ""
+}]
